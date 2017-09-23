@@ -144,7 +144,7 @@ window.onorientationchange = sizeDef;
         li.innerHTML = text;
       }
       
-      socket = new WebSocket('ws://localhost:8080');
+      socket = new WebSocket('ws://obscure-waters-65421.herokuapp.com/');
        
       socket.onopen = function () {
         name = prompt("Введи имя"); 
