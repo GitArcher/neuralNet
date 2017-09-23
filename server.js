@@ -41,7 +41,7 @@ wss.on('connection', function (ws) {
 
 });
 
-server.listen(5000, function () {
+server.listen(process.env.PORT, function () {
   console.log('Сервер запущен');
 });
 
