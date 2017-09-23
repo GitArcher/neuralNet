@@ -7,7 +7,7 @@ var app = express();
 app.use(express.static('res'));
 
 app.get('/', function(req, res){
-  res.sendfile("res/index.html");
+  res.send("Сервер устал и пошел спать, и ты иди.");
 });
 
 var server = http.createServer(app),
