@@ -18,11 +18,11 @@ var clients = [];
 wss.on('connection', function (ws) {
 
   clients.push(ws);
-//  console.log('Клиент',ws._ultron.id,': Connected');
+  console.log('Клиент',ws._ultron.id,': Connected');
 
   ws.on('message', function (msg) {
     rocode (msg, ws);
-//    console.log('Клиент:', msg);
+    console.log('Клиент:', msg);
   });
 
   ws.on('close', function () {
@@ -32,16 +32,16 @@ wss.on('connection', function (ws) {
         break;
       }
     }
-//    console.log('Клиент', ws.name, ':  disconnected');
+    console.log('Клиент', ws.name, ':  disconnected');
   });
 
   ws.on('error', function(err) {
-//    console.log('Ошибка ', err);
+    console.log('Ошибка ', err);
   });
 
 });
 
-server.listen(8080, function () {
+server.listen(5000, function () {
   console.log('Сервер запущен');
 });
 
