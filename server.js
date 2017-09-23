@@ -4,7 +4,7 @@ var express = require('express'),
 
 var app = express();
 
-app.use('/static', express.static(__dirname + 'res'));
+
 
 app.get('/', function(req, res){
   res.sendfile("res/index.html");
@@ -41,8 +41,9 @@ wss.on('connection', function (ws) {
 
 });
 
-server.listen(process.env.PORT, function () {
-  console.log('Сервер запущен');
+var port = process.env.PORT;
+server.listen(port, function () {
+  console.log('Сервер запущенна порту:'+port);
 });
 
 function sendAll (msg) {
