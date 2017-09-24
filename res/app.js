@@ -18,6 +18,8 @@ window.onload = function () {
       },
       canv = doc.getElementById('c1'), 
       ctx = canv.getContext('2d');
+      
+      reAnim ();
 
       mvpad.styles = getComputedStyle(mvpad);      
       mvpad.ontouchstart = getDistance;
@@ -63,42 +65,66 @@ window.onload = function () {
 
 window.onorientationchange = sizeDef;
       function sizeDef () {
-        globalheight = docEl.clientHeight*devicePixelRatio;
-        globalwidth = docEl.clientWidth*devicePixelRatio;
-        
-        canv.height = innerHeight = globalheight;
-        canv.width = innerWidth = globalwidth;
+		if(document.webkitIsFullScreen) {
+		  globalheight = screen.height*devicePixelRatio;
+		  globalwidth = screen.width*devicePixelRatio;
+		} else {
+          globalheight = innerHeight*devicePixelRatio;
+          globalwidth = innerWidth*devicePixelRatio;
+		}
+        canv.height = globalheight;
+        canv.width = globalwidth;
         canv.style.height = doc.body.style.height = globalheight+"px";
         canv.style.width = doc.body.style.width = globalwidth+"px";
+        
+        
          
         mvpad.coordX = 15+parseInt(mvpad.styles.width)/2;
         mvpad.coordY = rtpad.coordY = (globalheight-parseInt(mvpad.styles.height)-25)+parseInt(mvpad.styles.height)/2;
         rtpad.coordX = (globalwidth-parseInt(rtpad.styles.width)-15)+parseInt(rtpad.styles.width)/2;
       }
       sizeDef ();
-      alert(innerWidth+" "+document.documentElement.clientWidth)
+      
+      document.onwebkitfullscreenchange = function () {
+		  sizeDef()
+	  }
+      
+      setInterval (function () {
+		  list.innerHTML=innerHeight+" "+document.documentElement.clientHeight+" "+screen.height+" "+globalheight;
+		  }, 500)
 
-      btnStart.onclick = function () { 
-        doc.body.removeChild(btnStart);
-        doc.documentElement.webkitRequestFullscreen();
-   //     screen.orientation.lock('landscape');
+      function fullScreen() {
+        if(docEl.requestFullscreen) {
+          docEl.requestFullscreen();
+        } else if(docEl.webkitrequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        } else if(docEl.mozRequestFullscreen) {
+          docEl.mozRequestFullScreen();
+        }
+      }
 
-        doc.documentElement.style.zoom = screen.width/globalwidth;
-        reAnim ();
+      btnStart.onclick = function () {
+		if(document.webkitIsFullScreen) {
+		  document.webkitCancelFullScreen()
+		} else {      
+//        screen.orientation.lock('landscape');
+		docEl.webkitRequestFullscreen();
+//        doc.documentElement.style.zoom = globalwidth/screen.width;
+		}
       }
 
       function getDistance() {
         timerId = setTimeout(getDistance, 20);
-        if (obj.speedX > 1) {
+        if(obj.speedX > 1) {
           obj.speedX = 1;
         }
-        if (obj.speedX < -1) {
+        if(obj.speedX < -1) {
           obj.speedX = -1;
         }
-        if (obj.speedY > 1) {
+        if(obj.speedY > 1) {
           obj.speedY = 1;
         }
-        if (obj.speedY < -1) {
+        if(obj.speedY < -1) {
           obj.speedY = -1;
         }
         obj.x = obj.x+Math.round(obj.speedX*200)/100;
@@ -144,7 +170,7 @@ window.onorientationchange = sizeDef;
         li.innerHTML = text;
       }
       
-      socket = new WebSocket('wss://obscure-waters-65421.herokuapp.com/');
+      var socket = new WebSocket('wss://obscure-waters-65421.herokuapp.com/');
        
       socket.onopen = function () {
         name = prompt("Введи имя"); 

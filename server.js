@@ -1,5 +1,6 @@
 var express = require('express'),
     WebSocket = require('ws'),
+
     http = require('http');
 
 var app = express();
@@ -7,7 +8,7 @@ var app = express();
 app.use(express.static('res'));
 
 app.get('/', function(req, res){
-  res.send("Сервер устал и пошел спать, и ты иди. Кстати, Саня, как дела? Что делаешь?");
+  res.sendfile("res/index.html");
 });
 
 var server = http.createServer(app),
@@ -43,7 +44,7 @@ wss.on('connection', function (ws) {
 
 var port = process.env.PORT;
 server.listen(port, function () {
-  console.log('Сервер запущенна порту:'+port);
+  console.log('Сервер запущен порту:'+port);
 });
 
 function sendAll (msg) {
@@ -52,7 +53,7 @@ function sendAll (msg) {
   }
 }
 
-function rocode (msg, ws) {
+function rocode (msg, ws, uload) {
   if (msg[0] == 's') {
       msg = msg.split('');
       msg.shift();
