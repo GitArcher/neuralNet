@@ -33,7 +33,6 @@ window.onload = function () {
       mvpad.ontouchend = function () {
         clearTimeout(timerId);
       }
-      mvpad.onmousemove = function () {alert('s')}
 
       rtpad.styles = getComputedStyle(rtpad);
      // rtpad.ontouchstart
