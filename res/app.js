@@ -88,10 +88,6 @@ window.onorientationchange = sizeDef;
       document.onwebkitfullscreenchange = function () {
 		  sizeDef()
 	  }
-      
-      setInterval (function () {
-		  list.innerHTML=innerHeight+" "+document.documentElement.clientHeight+" "+screen.height+" "+globalheight;
-		  }, 500)
 
       function fullScreen() {
         if(docEl.requestFullscreen) {
