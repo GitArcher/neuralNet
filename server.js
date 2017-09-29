@@ -43,7 +43,7 @@ wss.on('connection', function (ws) {
 });
 
 var port = process.env.PORT || 8080;
-server.listen(port, '192.168.1.100', function () {
+server.listen(port, function () {
   console.log('Сервер запущен порту:'+port);
 });
 
