@@ -1,5 +1,7 @@
-window.onload = function () {		
-  var doc = document, docEl = doc.documentElement,
+  var doc = document, html = doc.documentElement,
+      globalwidth, globalheight;
+      
+  var mt = doc.getElementsByTagName('meta')[1],
       list = doc.getElementById('list'), 
       input = doc.getElementById('input'),
       chat = doc.getElementById('hide'),
@@ -7,87 +9,75 @@ window.onload = function () {
       mvpad = doc.getElementById('mvpad'),
       rtpad = doc.getElementById('rtpad'),
       btnStart = doc.getElementById('start'),
-      globalheight = screen.height*devicePixelRatio,
-      globalwidth = screen.width*devicePixelRatio,
-      name, fps = 0, socket, timerId, PosX, PosY,
-      obj = {
-        x: 402,
-        y: 202,
-        speedX: 0,
-        speedY: 0
-      },
       canv = doc.getElementById('c1'), 
       ctx = canv.getContext('2d');
       
+  var fps = 0, PosX = 0, PosY = 0, timerID;
+  var prefix = ['moz', 'webkit', 'ms', 'o'];
+            
+  var obj = {
+        x: 100,
+        y: 100,
+        R: 30,
+        speedX: 0,
+        speedY: 0,
+        angle: 0,
+      };  
+  var gameArea = {
+		  width: 4000,
+		  height: 4000,
+	  };
+  var camera = {
+		  posX: 0,
+		  posY: 0
+	  };
+ 
+	  onresize = setTimeout(sizeDef, 200);
+      onorientationchange = setTimeout(sizeDef, 200);
+      doc.onwebkitfullscreenchange = setTimeout(sizeDef, 200);
       reAnim ();
-
-      mvpad.styles = getComputedStyle(mvpad);      
-      mvpad.ontouchstart = getDistance;
-      mvpad.ontouchmove = function (e) {
-        PosX = Math.floor(e.targetTouches[0].clientX)*1.5; 
-        PosY = Math.floor(e.targetTouches[0].clientY)*1.5;
-        obj.speedX = (PosX-mvpad.coordX)/(parseInt(mvpad.styles.width)/2);
-        obj.speedY = (PosY-mvpad.coordY)/(parseInt(mvpad.styles.height)/2);
-        e.preventDefault();
-      }
-      mvpad.ontouchend = function () {
-        clearTimeout(timerId);
-      }
-
-      rtpad.styles = getComputedStyle(rtpad);
-     // rtpad.ontouchstart
-      rtpad.ontouchmove = function (e) {
-        PosX = Math.floor(e.targetTouches[0].clientX)*1.5;
-        PosY = Math.floor(e.targetTouches[0].clientY)*1.5;
-        rtpad.touchX = PosX-rtpad.coordX
-        rtpad.touchY = PosY-rtpad.coordY
-        rtpad.angle = rtpad.touchY/rtpad.touchX
-      }
+      sizeDef ();
 
       function reAnim () {
-        ctx.save()
-        ctx.clearRect(0, 0, canv.width, canv.height);
-        
+        ctx.clearRect(0, 0, canv.width, canv.height);       
         ctx.beginPath();
-        ctx.fillStyle = "rgb(255, 165, 0)";
-        ctx.arc(obj.x, obj.y, 25, 0, 2*Math.PI, true);
-        ctx.fill();
         
-        ctx.fillStyle = "rgb(0, 0, 255)";
-        ctx.fillRect(obj.x-4, obj.y, 8, 20);
-        ctx.translate(obj.x, obj.y)
-        ctx.rotate(rtpad.angle)
-        ctx.restore()
+        ctx.fillStyle = "rgb(255, 165, 0)";
+        ctx.arc(obj.x-camera.posX, obj.y-camera.posY, obj.R, 0, 2*Math.PI, true);
+        ctx.fill();
+        ctx.fillStyle = "rgb(126, 126, 126)";
+        
+        ctx.translate(obj.x, obj.y);
+        ctx.rotate(obj.angle);  
+        ctx.fillRect(0, -5, 35, 10);
+        ctx.rotate(-obj.angle);
+        ctx.translate(-obj.x, -obj.y);
+                
         fps++;
         requestAnimationFrame(reAnim);
       }
-
-window.onorientationchange = sizeDef;
+      
       function sizeDef () {
-		if(document.webkitIsFullScreen) {
-		  globalheight = screen.height*devicePixelRatio;
-		  globalwidth = screen.width*devicePixelRatio;
+		if(doc.webkitIsFullScreen) {
+          globalheight = screen.height*devicePixelRatio;
+          globalwidth = screen.width*devicePixelRatio;
 		} else {
-          globalheight = innerHeight*devicePixelRatio;
+		  globalheight = innerHeight*devicePixelRatio;
           globalwidth = innerWidth*devicePixelRatio;
 		}
+		
         canv.height = globalheight;
         canv.width = globalwidth;
         canv.style.height = doc.body.style.height = globalheight+"px";
-        canv.style.width = doc.body.style.width = globalwidth+"px";
+        canv.style.width = doc.body.style.width = globalwidth+"px";     
+        html.style.zoom = 1/devicePixelRatio;
         
-        
-         
-        mvpad.coordX = 15+parseInt(mvpad.styles.width)/2;
-        mvpad.coordY = rtpad.coordY = (globalheight-parseInt(mvpad.styles.height)-25)+parseInt(mvpad.styles.height)/2;
-        rtpad.coordX = (globalwidth-parseInt(rtpad.styles.width)-15)+parseInt(rtpad.styles.width)/2;
+        mvpad.mddlX = 90;
+        rtpad.mddlX = globalwidth+40;
+        mvpad.mddlY = 
+        rtpad.mddlY = globalheight-(15+90);
       }
-      sizeDef ();
-      
-      document.onwebkitfullscreenchange = function () {
-		  sizeDef()
-	  }
-
+	  
       function fullScreen() {
         if(docEl.requestFullscreen) {
           docEl.requestFullscreen();
@@ -99,18 +89,18 @@ window.onorientationchange = sizeDef;
       }
 
       btnStart.onclick = function () {
-		if(document.webkitIsFullScreen) {
-		  document.webkitCancelFullScreen()
+		if(doc.webkitIsFullScreen) {
+		  doc.webkitCancelFullScreen();
+		  html.style.zoom = 1/devicePixelRatio;
 		} else {      
-//        screen.orientation.lock('landscape');
-		docEl.webkitRequestFullscreen();
-//        doc.documentElement.style.zoom = globalwidth/screen.width;
+        screen.orientation.lock('landscape');
+		html.webkitRequestFullscreen();
+        html.style.zoom = 1/devicePixelRatio;
 		}
       }
 
       function getDistance() {
-        timerId = setTimeout(getDistance, 20);
-        if(obj.speedX > 1) {
+ /*       if(obj.speedX > 1) {
           obj.speedX = 1;
         }
         if(obj.speedX < -1) {
@@ -121,10 +111,32 @@ window.onorientationchange = sizeDef;
         }
         if(obj.speedY < -1) {
           obj.speedY = -1;
-        }
+        }*/
+        
+		if(obj.x-obj.R <= 0 && obj.speedX >= '-1' && obj.speedX <= 0) { 
+		  obj.speedX = 0;
+		  obj.x = obj.R;
+	    } else if(obj.x+obj.R >= canv.width && obj.speedX <= 1 && obj.speedX >= 0) {
+		  obj.speedX = 0;
+		  obj.x = canv.width-obj.R;
+		}
+		if(obj.y-obj.R <= 0 && obj.speedY >= '-1' && obj.speedY <= 0) {
+		  obj.speedY = 0;
+		  obj.y = obj.R;
+		} else if(obj.y+obj.R >= canv.height && obj.speedY <= 1 && obj.speedY >= 0) {
+		  obj.speedY = 0;
+		  obj.y = canv.height-obj.R
+		}
         obj.x = obj.x+Math.round(obj.speedX*200)/100;
         obj.y = obj.y+Math.round(obj.speedY*200)/100;
+		timerID = setTimeout(getDistance, 20);
       }
+      
+       
+	  
+	  function clearTimer () {
+	    clearTimeout(timerID);
+	  }
  
       chat.onclick = function () {
         if (list.style.left == "-500px") {
@@ -135,50 +147,13 @@ window.onorientationchange = sizeDef;
         else {
           list.style.left= "-500px";
           input.style.left = "-500px";
+          chat.style.width = '6%';
           chat.innerHTML = "Показать чат";
         } 
       } 
 
-      setTimeout(function timerfps () {
-        setTimeout(timerfps, 1000);
+      setInterval(function () {
         notfps.innerHTML = "fps: "+fps;
         fps = 0;
       }, 1000);
-      
-      input.onkeydown = function (e) {
-        if (e.keyCode == "13") {
-          socket.send(name+": "+input.value);
-          input.value = ' ';
-        }   
-      }
 
-      function checkName () {
-        if (name.length == 0 || name === 'null') {
-          name = prompt("Введи имя");
-          checkName ();
-        }
-      }
-
-      function addli (text) {
-        var li = doc.createElement('li');
-        list.appendChild(li);
-        li.innerHTML = text;
-      }
-      
-      var socket = new WebSocket('wss://obscure-waters-65421.herokuapp.com/');
-       
-      socket.onopen = function () {
-        name = prompt("Введи имя"); 
-        checkName ();
-        socket.send('s'+name);
-        addli("Connected to server!");
-      }
-     
-      socket.onmessage = function (e) {
-        addli(e.data);
-      }
-       
-      socket.onerror = function (error) {
-        alert(error.message);
-      }
-}

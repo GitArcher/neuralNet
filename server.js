@@ -43,7 +43,7 @@ wss.on('connection', function (ws) {
 });
 
 var port = process.env.PORT || 8080;
-server.listen(port, function () {
+server.listen(port, '192.168.1.100', function () {
   console.log('Сервер запущен порту:'+port);
 });
 
@@ -59,6 +59,8 @@ function rocode (msg, ws, uload) {
       msg.shift();
       ws.name = msg.join('');
       sendAll (ws.name +' connected');
+  } else if (msg[0] == 'g') {
+	  
   } else
   sendAll(msg);
 }
