@@ -6,8 +6,7 @@
       input = doc.getElementById('input'),
       chat = doc.getElementById('hide'),
       notfps = doc.getElementById('fps'),
-      mvpad = doc.getElementById('mvpad'),
-      rtpad = doc.getElementById('rtpad'),
+
       btnStart = doc.getElementById('start'),
       canv = doc.getElementById('c1'), 
       ctx = canv.getContext('2d');

@@ -90,10 +90,20 @@
     <input type="text/plain" id="input"></input>
     <div id="hide">Скрыть чат</div>
     <img id="start" src='img/full.png'></img>
+    <script>
+	  if(navigator.maxTouchPoints>0) {
+		var mvpad = document.getElementById('mvpad');
+        var rtpad = document.getElementById('rtpad');
+        document.body.appendChild(document.createElement('script').src='touch.js')
+	  } else {
+	    document.getElementById('mvpad').remove();
+        document.getElementById('rtpad').remove();
+	  }
+    </script>
 	<script src='socket.js'></script>
     <script src='app.js'></script>
     <script src='mouse.js'></script>
-    <script src='touch.js'></script>
+
 
   </body>
 </html>
