@@ -18,7 +18,6 @@ function getTouchCoords(e) {
 		e.preventDefault();
 	    PosX = Math.floor(e.targetTouches[0].clientX)*devicePixelRatio; 
         PosY = Math.floor(e.targetTouches[0].clientY)*devicePixelRatio;
-        list.innerHTML = PosX+" "+PosY
         
         obj.speedX = (parseInt(PosX-mvpad.mddlX) ) / (75);
         obj.speedY = (parseInt(PosY-mvpad.mddlY) ) / (75);
