@@ -1,8 +1,20 @@
 var statusWork = [];
+var events;
+var timerShot;
 addEventListener("mousemove", setRotate);
+
+addEventListener("mousemove", function(e) {
+  events = e;     
+});
 addEventListener("mousedown", function(e) {
-	obj.bullets.push(new CreateBullet(e));
-    obj.bullets[obj.bullets.length-1].setInterval();	
+  events = e;
+  timerShot = setInterval( function() {
+	obj.bullets.push( new CreateBullet(events) );
+    obj.bullets[obj.bullets.length-1].setInterval();
+  }, 400);	
+});
+addEventListener("mouseup", function() {
+  clearInterval(timerShot)
 });
 
 addEventListener("keydown", function (e) {
@@ -12,22 +24,22 @@ addEventListener("keydown", function (e) {
   if(e.keyCode == 37) {
 	setWork(0);
     obj.speedX =
-    camera.speedX = -3;		
+    camera.speedX = -1;		
   } else 
   if(e.keyCode == 39) {
     setWork(1);
     obj.speedX =
-    camera.speedX = 3;
+    camera.speedX = 1;
   }
   if(e.keyCode == 38) {
     setWork(2);
     obj.speedY =
-    camera.speedY = -3;
+    camera.speedY = -1;
   } else
   if(e.keyCode == 40) {
     setWork(3);
     obj.speedY =
-	camera.speedY = 3;
+	camera.speedY = 1;
   }			
 });
 

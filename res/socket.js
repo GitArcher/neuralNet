@@ -1,5 +1,6 @@
+var gamer = [];
 var socket = new WebSocket('wss://obscure-waters-65421.herokuapp.com/');
-//var socket = new WebSocket('ws://192.168.1.101:8080');
+//var socket = new WebSocket('ws://localhost:8080');
 var name;
        
     socket.onopen = function () {
@@ -10,8 +11,19 @@ var name;
     }
      
     socket.onmessage = function (e) {
-      addli(e.data);
-    }
+	var msg = e.data;
+	  if(e.data[0] === 'm') {		 
+		msg = msg.split('');
+		msg.shift();
+		msg = msg.join('');
+		addli(msg);
+	  } else {
+		arr = msg.split(';')
+		for(i=0; i<arr.length; i++) {    
+          arr[i] = JSON.parse(arr[i]);        
+        };
+      };
+    };
        
     socket.onerror = function (error) {
       alert(error.message);
@@ -26,7 +38,7 @@ var name;
       
     input.onkeydown = function (e) {
       if (e.keyCode == "13") {
-        socket.send(name+": "+input.value);
+        socket.send("m"+name+": "+input.value);
         input.value = ' ';
       }   
     }

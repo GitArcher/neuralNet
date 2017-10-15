@@ -12,7 +12,7 @@
       }
       canvas {
 		width: 100%;
-		height: 100%
+		height: 100%;
         position: absolute;
         top: 0;
         left: 0;
@@ -104,6 +104,9 @@
 	  } else {
 	    document.getElementById('mvpad').remove();
         document.getElementById('rtpad').remove();
+        var script = document.createElement('script');
+        script.src = 'mouse.js';
+        document.body.appendChild(script);
 	  }
 	    var doc = document, html = doc.documentElement,
       globalwidth, globalheight;
@@ -121,7 +124,8 @@
         
   var fps = 0, PosX = 0, PosY = 0, timerID, status;
   var prefix = ['moz', 'webkit', 'ms', 'o'];
-            
+  var arr = [];
+          
   var obj = {
         x: 400,
         y: 200,
@@ -132,7 +136,8 @@
         speedY: 0,
         angle: 0,
 		bullets: []
-      };  
+      };
+  
   var gameArea = {
 		  width:0,
 		  height:0
@@ -151,19 +156,14 @@
         reAnim ();
       }
       sizeDef ();
-      
 
       function reAnim () {
         ctx.clearRect(0, 0, canv.width, canv.height); 
         drawFon();
-        drawBullet();
-        ctx.beginPath();        
+//        drawBullet();        
         ctx.fillStyle = "rgb(255, 165, 0)";
-        ctx.arc(obj.x, obj.y, obj.R, 0, 2*Math.PI, true);
-        ctx.fill();
-        ctx.fillStyle = "rgb(126, 126, 126)";
-
-        
+        drawAll();        
+        ctx.fillStyle = "rgb(126, 126, 126)";       
         ctx.translate(obj.x, obj.y);
         ctx.rotate(obj.angle);  
         ctx.fillRect(0, -5, 35, 10);
@@ -174,10 +174,20 @@
         requestAnimationFrame(reAnim);
       }
       
-      function drawBullet() {
-		for(i=0; i<obj.bullets.length; i++) {
+      function drawAll() {
+		for(n=0; n<arr.length; n++) {
+		  drawBullet(n);
+		  ctx.beginPath();         
+          ctx.arc(arr[n].posX-camera.posX, arr[n].posY-camera.posY, obj.R, 0, 2*Math.PI, true);
+          ctx.fill();
+            
+		}
+	  }
+      
+      function drawBullet(n) {
+		for(i=0; i<arr[n].bullets.length; i++) {
 		  ctx.beginPath();
-	      ctx.arc(obj.bullets[i].x-camera.posX, obj.bullets[i].y-camera.posY, 10, 0, 2*Math.PI, true);
+	      ctx.arc(arr[n].bullets[i].x-camera.posX, arr[n].bullets[i].y-camera.posY, 10, 0, 2*Math.PI, true);
 	      ctx.fill();
 		}
 	  }
@@ -216,6 +226,8 @@
 	  function CreateBullet(e) {
 		this.x = obj.posX;
 		this.y = obj.posY;
+		this.posX = Math.round(e.pageX*devicePixelRatio)-obj.x;
+		this.posY = Math.round(e.pageY*devicePixelRatio)-obj.y;
 		this.setInterval = function () {
 		  this.timer = setInterval(this.setDistance.bind(this), 15);		
 		  setTimeout(this.clearInterval.bind(this), 2000);
@@ -228,25 +240,23 @@
 		    };
 	      };
 		};
-		this.setDistance = function() {
-		  var posX = Math.round(e.pageX*devicePixelRatio)-obj.x;
-		  var posY = Math.round(e.pageY*devicePixelRatio)-obj.y;
-		  if(posX > 0 && posY > 0) { 
-		    this.getDistance(5, 5, posX, posY);
+		this.setDistance = function() { 
+		  if(this.posX > 0 && this.posY > 0) { 
+		    this.getDistance(5, 5);
 		  };
-		  if(posX < 0 && posY > 0) {
-			this.getDistance(-5, 5, posX, posY);	
+		  if(this.posX < 0 && this.posY > 0) {
+			this.getDistance(-5, 5);	
 		  };
-		  if(posX < 0 && posY < 0) {
-			this.getDistance(-5, -5, posX, posY);
+		  if(this.posX < 0 && this.posY < 0) {
+			this.getDistance(-5, -5);
 		  }
-		  if(posX > 0 && posY < 0) {
-			this.getDistance(5, -5, posX, posY)
+		  if(this.posX > 0 && this.posY < 0) {
+			this.getDistance(5, -5)
 		  }
 		}  
-	    this.getDistance = function (x, y, posX, posY) {
-		  posX = Math.abs(posX);
-		  posY = Math.abs(posY);
+	    this.getDistance = function (x, y) {
+		  var posX = Math.abs(this.posX);
+		  var posY = Math.abs(this.posY);
 		  if(posX > posY) {
 		    this.x += x;
 		    this.y += (posY*y)/posX;
@@ -259,21 +269,7 @@
       };
 	  
 
-	  
-
       function getDistance() {
-        if(obj.speedX > 3) {
-          obj.speedX = 3;
-        }
-        if(obj.speedX < -3) {
-          obj.speedX = -3;
-        }
-        if(obj.speedY > 3) {
-          obj.speedY = 3;
-        }
-        if(obj.speedY < -3) {
-          obj.speedY = -3;
-        }
         status = 'working';
 
         camera.posX += camera.speedX;
@@ -307,6 +303,8 @@
 
 		obj.posX += obj.speedX;
 		obj.posY += obj.speedY;
+		var str = JSON.stringify(obj); 
+	    socket.send(str);
 
         obj.x = obj.posX-camera.posX;
         obj.y = obj.posY-camera.posY;
@@ -326,9 +324,17 @@
 		  obj.y = canv.height-obj.R
 		}
  
-		timerID = setTimeout(getDistance, 15);
+		timerID = setTimeout(getDistance, 5);
       }
-            
+      
+/*      setInterval(function() {
+		var str = JSON.stringify(obj); 
+	    socket.send(str);  
+	  }, 1)
+*/      
+      
+      
+      
       btnFullscreen.onclick = function () {
 		if(doc.webkitIsFullScreen === true) {
 		  doc.webkitCancelFullScreen();
@@ -356,16 +362,28 @@
 	  }
  
       chat.onclick = function () {
-        if (list.style.left == "-500px") {
-          list.style.left = "1px";
-          input.style.left = "1px";
+		var width = parseInt(getComputedStyle(list).width);
+		var left = parseInt(getComputedStyle(list).left);
+		console.log(input.style.display)
+        if (left < 0) {
+          chat.style.width = "32%";
+          list.style.width = "30%";
+          list.style.left = "0px";
+          input.style.display = "block";
           chat.innerHTML = "Скрыть чат";
         } 
         else {
-          list.style.left= "-500px";
-          input.style.left = "-500px";
-          chat.style.width = '6%';
-          chat.innerHTML = "Показать чат";
+		  input.style.display = "none";
+		  var timer = setInterval(function (){
+			left -= 10;
+            list.style.left = left+"px";           
+            if(left+width+(width*0.1) < 0) {
+			  clearInterval(timer);
+              chat.style.width = '6%';
+              chat.innerHTML = "Показать чат";
+
+		    }
+	      }, 20, width, left);
         } 
       } 
 
@@ -377,8 +395,6 @@
 document.getElementsByTagName('script')[0].remove();
     </script>
 	<script src='socket.js'></script>
-    <script src='mouse.js'></script>
-
 
   </body>
 </html>
