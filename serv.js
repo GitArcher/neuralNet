@@ -6,7 +6,7 @@ let port = process.env.PORT || 8080;
 app.use('/op', express.static(__dirname+'/res'));
 
 app.get('/', function (req, res) {
-  res.sendFile('/op'+'/index.html');
+  res.sendFile(__dirname+'/index.html');
 });
 
 app.listen(port, () => {
