@@ -23,11 +23,6 @@ let buffCanv = document.createElement('canvas'),
 buffCanv.width = 40;
 buffCanv.height = 40;
 
-let input = {
-  x:0,
-  y:0,
-};
-let idTimer;
 let symbol = "Например: a, 1, sumbol, yourSumbolName";
 
 let NNet = {
@@ -128,41 +123,4 @@ load.addEventListener('click', () => {
 
 mmr.addEventListener('click', () => {
   cstmMsg.style.visibility = 'visible';
-});
-
-canv.addEventListener('mousedown', (e) => {
-  clearInterval(idTimer);
-  input.canvWidth = parseInt(getComputedStyle(canv).width);
-  input.canvHeight = parseInt(getComputedStyle(canv).height);
-  input.x = e.offsetX*300/input.canvWidth;
-  input.y = e.offsetY*300/input.canvHeight;
-  ctx.beginPath();
-  ctx.moveTo(input.x, input.y)
-  idTimer = setInterval(drawStart, 15)
-});
-
-canv.addEventListener('mousemove', (e) => {
-  input.x = e.offsetX*300/input.canvWidth;
-  input.y = e.offsetY*300/input.canvHeight;
-});
-
-canv.addEventListener('mouseup', () => {
-  clearInterval(idTimer);
-  ctx.closePath();
-  iknow.innerHTML = 'Если дорисовал - нажми "ОБУЧИТЬ"';
-});
-
-canv.addEventListener('mouseleave', () => {
-  clearInterval(idTimer);
-  ctx.closePath();
-});
-
-function drawStart() {
-  ctx.lineTo(input.x, input.y);
-  ctx.stroke();
-  ctx.moveTo(input.x, input.y);
-};
-
-btnClear.addEventListener("click", () => {
-  ctx.clearRect(0, 0, 300, 300);
 });
